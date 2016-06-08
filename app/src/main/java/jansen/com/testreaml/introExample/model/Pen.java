@@ -18,6 +18,6 @@ package jansen.com.testreaml.introExample.model;
 
 import io.realm.RealmObject;
 
-public class Dog extends RealmObject {
-    public String name;
+public class Pen extends RealmObject {
+    public  String name;
 }

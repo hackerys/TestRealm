@@ -13,6 +13,7 @@ public class BaseActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //在ui线程中打开realm
         realm = Realm.getDefaultInstance();
     }
 

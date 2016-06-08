@@ -22,17 +22,17 @@ import io.realm.annotations.Ignore;
 
 // Your model just have to extend RealmObject.
 // This will inherit an annotation which produces proxy getters and setters for all fields.
-public class Person extends RealmObject {
+public class People extends RealmObject {
 
     // All fields are by default persisted.
     private String name;
     private int age;
 
     // Other objects in a one-to-one relation must also subclass RealmObject
-    private Dog dog;
+    private Phone mPhone;
 
     // One-to-many relations is simply a RealmList of the objects which also subclass RealmObject
-    private RealmList<Cat> cats;
+    private RealmList<Pen> mPens;
 
     // You can instruct Realm to ignore a field and not persist it.
     @Ignore
@@ -41,7 +41,7 @@ public class Person extends RealmObject {
     private long id;
 
     // Let your IDE generate getters and setters for you!
-    // Or if you like you can even have public fields and no accessors! See Dog.java and Cat.java
+    // Or if you like you can even have public fields and no accessors! See Phone.java and Pen.java
     public String getName() {
         return name;
     }
@@ -58,20 +58,20 @@ public class Person extends RealmObject {
         this.age = age;
     }
 
-    public Dog getDog() {
-        return dog;
+    public Phone getPhone() {
+        return mPhone;
     }
 
-    public void setDog(Dog dog) {
-        this.dog = dog;
+    public void setPhone(Phone mPhone) {
+        this.mPhone = mPhone;
     }
 
-    public RealmList<Cat> getCats() {
-        return cats;
+    public RealmList<Pen> getPens() {
+        return mPens;
     }
 
-    public void setCats(RealmList<Cat> cats) {
-        this.cats = cats;
+    public void setPens(RealmList<Pen> mPens) {
+        this.mPens = mPens;
     }
 
     public int getTempReference() {

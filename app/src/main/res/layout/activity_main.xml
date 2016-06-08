@@ -13,22 +13,22 @@
 
     <Button
         android:id="@+id/add"
-        android:text="add dog"
+        android:text="add mPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/update"
-        android:text="update dog"
+        android:text="update mPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/del"
-        android:text="del dog"
+        android:text="del mPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/query"
-        android:text="query dog"
+        android:text="query mPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>

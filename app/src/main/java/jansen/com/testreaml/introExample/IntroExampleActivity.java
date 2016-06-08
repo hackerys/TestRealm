@@ -28,17 +28,16 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import jansen.com.testreaml.R;
-import jansen.com.testreaml.introExample.model.Cat;
-import jansen.com.testreaml.introExample.model.Dog;
-import jansen.com.testreaml.introExample.model.Person;
+import jansen.com.testreaml.base.BaseActivity;
+import jansen.com.testreaml.introExample.model.Pen;
+import jansen.com.testreaml.introExample.model.People;
+import jansen.com.testreaml.introExample.model.Phone;
 
-public class IntroExampleActivity extends Activity {
+public class IntroExampleActivity extends BaseActivity {
 
     public static final String TAG = IntroExampleActivity.class.getName();
     private LinearLayout rootLayout = null;
 
-    private Realm realm;
-    private RealmConfiguration realmConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,17 +48,18 @@ public class IntroExampleActivity extends Activity {
 
         // These operations are small enough that
         // we can generally safely run them on the UI thread.
-
-        // Create the Realm configuration
-        realmConfig = new RealmConfiguration.Builder(this).build();
-        // Open the Realm for the UI thread.
-        realm = Realm.getInstance(realmConfig);
-
+        /**
+         * 一次额常规的小操作可以在ui线程中进行
+         */
         basicCRUD(realm);
         basicQuery(realm);
         basicLinkQuery(realm);
 
         // More complex operations can be executed on another thread.
+        /**
+         * 非常复杂的操作最好是放到其他线程中去操作
+         * 异步任务的looper是主线程的looper
+         */
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
@@ -96,26 +96,26 @@ public class IntroExampleActivity extends Activity {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                // Add a person
-                Person person = realm.createObject(Person.class);
-                person.setId(1);
-                person.setName("Young Person");
-                person.setAge(14);
+                // Add a mPeople
+                People mPeople = realm.createObject(People.class);
+                mPeople.setId(1);
+                mPeople.setName("Young People");
+                mPeople.setAge(14);
 
             }
         });
 
-        // Find the first person (no query conditions) and read a field
-        final Person person = realm.where(Person.class).findFirst();
-        showStatus(person.getName() + ":" + person.getAge());
+        // Find the first mPeople (no query conditions) and read a field
+        final People mPeople = realm.where(People.class).findFirst();
+        showStatus(mPeople.getName() + ":" + mPeople.getAge());
 
-        // Update person in a transaction
+        // Update mPeople in a transaction
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                person.setName("Senior Person");
-                person.setAge(99);
-                showStatus(person.getName() + " got older: " + person.getAge());
+                mPeople.setName("Senior People");
+                mPeople.setAge(99);
+                showStatus(mPeople.getName() + " got older: " + mPeople.getAge());
             }
         });
 
@@ -123,25 +123,32 @@ public class IntroExampleActivity extends Activity {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.delete(Person.class);
+                realm.delete(People.class);
             }
         });
     }
 
     private void basicQuery(Realm realm) {
         showStatus("\nPerforming basic Query operation...");
-        showStatus("Number of persons: " + realm.where(Person.class).count());
+        showStatus("Number of persons: " + realm.where(People.class).count());
 
-        RealmResults<Person> results = realm.where(Person.class).equalTo("age", 99).findAll();
+        RealmResults<People> results = realm.where(People.class)
+                .equalTo("age", 99)
+                .findAll();
 
         showStatus("Size of result set: " + results.size());
     }
 
+    /**
+     * 连表查询
+     *
+     * @param realm
+     */
     private void basicLinkQuery(Realm realm) {
         showStatus("\nPerforming basic Link Query operation...");
-        showStatus("Number of persons: " + realm.where(Person.class).count());
+        showStatus("Number of persons: " + realm.where(People.class).count());
 
-        RealmResults<Person> results = realm.where(Person.class).equalTo("cats.name", "Tiger").findAll();
+        RealmResults<People> results = realm.where(People.class).equalTo("mPens.name", "Tiger").findAll();
 
         showStatus("Size of result set: " + results.size());
     }
@@ -151,53 +158,53 @@ public class IntroExampleActivity extends Activity {
 
         // Open the default realm. All threads must use it's own reference to the realm.
         // Those can not be transferred across threads.
-        Realm realm = Realm.getInstance(realmConfig);
+        Realm realm = Realm.getDefaultInstance();
 
         // Add ten persons in one transaction
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Dog fido = realm.createObject(Dog.class);
+                Phone fido = realm.createObject(Phone.class);
                 fido.name = "fido";
                 for (int i = 0; i < 10; i++) {
-                    Person person = realm.createObject(Person.class);
-                    person.setId(i);
-                    person.setName("Person no. " + i);
-                    person.setAge(i);
-                    person.setDog(fido);
+                    People mPeople = realm.createObject(People.class);
+                    mPeople.setId(i);
+                    mPeople.setName("People no. " + i);
+                    mPeople.setAge(i);
+                    mPeople.setPhone(fido);
 
                     // The field tempReference is annotated with @Ignore.
-                    // This means setTempReference sets the Person tempReference
+                    // This means setTempReference sets the People tempReference
                     // field directly. The tempReference is NOT saved as part of
                     // the RealmObject:
-                    person.setTempReference(42);
+                    mPeople.setTempReference(42);
 
                     for (int j = 0; j < i; j++) {
-                        Cat cat = realm.createObject(Cat.class);
-                        cat.name = "Cat_" + j;
-                        person.getCats().add(cat);
+                        Pen mPen = realm.createObject(Pen.class);
+                        mPen.name = "Cat_" + j;
+                        mPeople.getPens().add(mPen);
                     }
                 }
             }
         });
 
         // Implicit read transactions allow you to access your objects
-        status += "\nNumber of persons: " + realm.where(Person.class).count();
+        status += "\nNumber of persons: " + realm.where(People.class).count();
 
         // Iterate over all objects
-        for (Person pers : realm.where(Person.class).findAll()) {
+        for (People pers : realm.where(People.class).findAll()) {
             String dogName;
-            if (pers.getDog() == null) {
+            if (pers.getPhone() == null) {
                 dogName = "None";
             } else {
-                dogName = pers.getDog().name;
+                dogName = pers.getPhone().name;
             }
-            status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName + " : " + pers.getCats().size();
+            status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName + " : " + pers.getPens().size();
         }
 
         // Sorting
-        RealmResults<Person> sortedPersons = realm.where(Person.class).findAllSorted("age", Sort.DESCENDING);
-        status += "\nSorting " + sortedPersons.last().getName() + " == " + realm.where(Person.class).findFirst()
+        RealmResults<People> mSortedPeoples = realm.where(People.class).findAllSorted("age", Sort.DESCENDING);
+        status += "\nSorting " + mSortedPeoples.last().getName() + " == " + realm.where(People.class).findFirst()
                 .getName();
 
         realm.close();
@@ -207,13 +214,13 @@ public class IntroExampleActivity extends Activity {
     private String complexQuery() {
         String status = "\n\nPerforming complex Query operation...";
 
-        Realm realm = Realm.getInstance(realmConfig);
-        status += "\nNumber of persons: " + realm.where(Person.class).count();
+        Realm realm = Realm.getDefaultInstance();
+        status += "\nNumber of persons: " + realm.where(People.class).count();
 
-        // Find all persons where age between 7 and 9 and name begins with "Person".
-        RealmResults<Person> results = realm.where(Person.class)
+        // Find all persons where age between 7 and 9 and name begins with "People".
+        RealmResults<People> results = realm.where(People.class)
                 .between("age", 7, 9)       // Notice implicit "and" operation
-                .beginsWith("name", "Person").findAll();
+                .beginsWith("name", "People").findAll();
         status += "\nSize of result set: " + results.size();
 
         realm.close();

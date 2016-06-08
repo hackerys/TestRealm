@@ -18,6 +18,14 @@ package jansen.com.testreaml.introExample.model;
 
 import io.realm.RealmObject;
 
-public class Cat extends RealmObject {
-    public  String name;
+public class Phone extends RealmObject {
+    public String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String mName) {
+        name = mName;
+    }
 }
